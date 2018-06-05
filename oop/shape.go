@@ -30,7 +30,7 @@ type Rectangle struct {
 
 func (r Rectangle) Area() float64 { return r.x * r.y } // OVERRIDE
 
-func (s Square) Perimeter() float64 { return s.x + s.Area()/s.x }
+func (s Square) Perimeter() float64 { return 2 * (s.x + s.Area()/s.x) }
 
 func main() {
 	s := Square{5}
