@@ -1,0 +1,354 @@
+The way to Go
+
+Dimitris Dranidis
+
+The University of Sheffield International Faculty
+
+CITY College
+
+dranidis@citycollege.sheffield.eu
+
+* Hello world
+
+.play  -edit hello/hello.go
+
+
+
+
+* Hello Web
+
+
+Starts a web server at [[http://localhost:8080]] using the default HTTP router DefaultServeMux. HandleFunc adds a handler to the router. 
+
+
+.play helloweb/helloweb.go
+
+* Go history
+
+- created at Google, 2009
+- by Robert Griesemer, Rob Pike, and Ken Thompson
+- open source
+- First release in 2012, Go 1
+- Feb 2018, Go 1.10
+
+
+
+* Go features
+
+- statically typed (with implicit type inference)
+- compiled (fast compilation)
+- gargage collection
+- object-oriented
+- functional
+- concurrent
+
+
+* Code organization and tools
+
+
+* Code organization
+
+One workspace (e.g. ~/go), containing 3 directories: src, pkg, bin
+
+ bin/
+    hello                          # command executable
+    outyet                         # command executable
+ pkg/
+    linux_amd64/
+        github.com/golang/example/
+            stringutil.a           # package object
+ src/
+    github.com/golang/example/
+        hello/
+            hello.go               # command source
+        outyet/
+            main.go                # command source
+            main_test.go           # test source
+        stringutil/
+            reverse.go             # package source
+            reverse_test.go        # test source
+    golang.org/x/image/
+        bmp/
+            reader.go              # package source
+            writer.go              # package source
+
+
+* Tools
+
+#-Build files
+
+ go build
+
+#-Install binaries in pkg and bin 
+
+ go install
+
+#-Run all tests and report results
+
+ go test
+
+#-Format code
+
+ go fmt
+
+#-Report suspicious code
+
+ go vet
+ 
+#-Get help on a command
+ 
+ go doc 
+
+
+ go ...
+
+
+
+
+* Some language features
+
+
+* Features 
+
+Statically typed with implicit type inference at compile time
+
+ 	i := 3 // same with var i int = 3
+
+Multiple assignments
+
+   a, b = b, a
+
+Multiple return values
+
+ func foo() (int, int) {
+     ...
+     return a, b
+ }
+ x, y := foo()
+
+Package visibility
+  
+  func Foo() {...}  // visible outside the package
+  func foo() {...}  // private to the package
+
+* Variadic functions
+
+Functions that accept a variable number of arguments
+
+.play -edit variadic/variadic.go
+
+
+
+* Deferred execution
+
+You can execute a function call after the termination of the surrounding function.
+Arguments are evaluated immediately.
+
+.play -edit defer/defer.go
+
+Good for cleanup, e.g. closing files.
+
+
+
+* Functional aspects
+
+
+
+* Functions as values
+
+.play -edit eval/eval.go /M OMIT/,/END OMIT/
+
+
+* Currying
+
+A function returning a function (closure)
+
+.play -edit currying/currying.go
+
+
+
+
+######################################################################
+
+* Go is Object-Oriented (?)
+
+
+
+* Struct types instead of classes
+#.code  -edit player/player.go /STRUCT OMIT/,/END OMIT/
+.code  -edit oop/shape.go /Square OMIT/,/}/
+
+Variables of user-defined types (objects)
+
+# m := MP3Player{"We will rock you!"}
+ s := Square{5}
+
+All user-defined types can have functions attached (methods)
+#.code  -edit player/player.go /METHOD OMIT/,/END OMIT/
+.code  -edit oop/shape.go /func .* Area/,/}/
+
+Calling a method
+
+# m.Play()
+ fmt.Println(s.Area())
+
+
+
+
+* Interfaces
+
+#.code player/player.go /INTER OMIT/,/END OMIT/
+.code oop/shape.go /Shape OMIT/,/}/
+
+Types *implicitly* realize interfaces by implementing their methods
+.code  -edit oop/shape.go /func .* Area/,/}/
+
+.code -edit oop/shape.go /func PrintArea/,/}/
+
+#.play  -edit player/player.go /CLIENT OMIT/,/END OMIT/
+.play  -edit oop/shape.go /func main/,/OMIT/
+
+
+
+* Composition (Embedding) instead of Inheritance
+
+.play  -edit oop/shape.go /type Rectangle/,/END OMIT/
+
+
+#############################################
+
+* Error Handling
+
+* Errors as function results - Instead of exceptions
+
+Errors (implicitly) implement the error interface, by having the Error() method.
+.code  -edit error/error.go /ERROR OMIT/,/END OMIT/
+
+Functions may return errors
+.code -edit error/error.go /DIV OMIT/,/END OMIT/
+
+
+
+* Checking for errors
+.play -edit error/error.go /CHECK OMIT/,/END OMIT/
+
+
+
+############################################
+
+
+* Testing
+
+* Testing
+
+Test files end in _test.go, are in the same directory with package sources. 
+Test functions have the form
+
+ func TestFoo(t *testing.T) {
+     ...
+ }
+
+go test executes all tests
+
+.code -edit factorial/factorial_test.go  /TEST OMIT/,/END OMIT/
+
+No assertions.  Full manual control.
+
+
+
+
+
+
+
+
+
+######################################################
+
+* Concurrency
+
+
+* Goroutines
+
+.play  -edit goroutines/goroutines.go /CODE OMIT/,/END OMIT/
+
+
+
+* Communication
+
+Go follows the CSP (Communicating Sequential Processes) semantics.
+
+Communication is synchronous (blocking)
+
+Write a value to a channel
+.code clock/clock.go /WRITE OMIT/,/END OMIT/
+
+Read a value from a channel (and assign to a variable)
+.code  -edit clock/clock.go /READ OMIT/,/END OMIT/
+
+Spawning a goroutine
+.code  -edit clock/clock.go /GO OMIT/,/END OMIT/
+
+ 
+* Example of synchronous channel communication
+.play  -edit clock/clock.go /CODE OMIT/,/ENDCODE OMIT/
+
+
+* Tasks
+
+Mock Tasks
+.code  -edit tasks/tasks_s.go /Task OMIT/,/END OMIT/
+
+
+Work on task
+.code  -edit tasks/tasks_s.go /Work OMIT/,/}/
+
+
+* Worker
+
+Channels
+.code  -edit tasks/tasks_s.go /CHAN OMIT/,/END OMIT/
+
+Worker
+.code  -edit tasks/tasks_s.go /WORKER OMIT/,/END OMIT/
+
+
+
+* Worker pool (cont)
+
+.play  -edit tasks/tasks_s.go /MAIN OMIT/,/END OMIT/
+
+* Consume from many producers
+.code  -edit producer/producer.go /PROD OMIT/,/END OMIT/
+
+* Consumer (Select statement)
+.code  -edit producer/producer.go /CONS OMIT/,/END OMIT/
+.play  -edit producer/producer.go /func main/,/}/
+
+
+
+###################### REST ###########################
+
+* Building a REST API
+
+* REST API Routes
+
+Using a 3rd party HTTP router and dispatcher
+.link https://github.com/gorilla/mux
+
+#.play  -edit restapi/restapi.go
+
+#* REST API - Routes
+
+.play  -edit restapi/restapi.go /ROUTE OMIT/,/END OMIT/
+.link http://localhost:8080/api/products
+.link http://localhost:8080/api/product/cof
+
+* REST API - JSON Encoding
+
+.code  -edit restapi/restapi.go /PROD OMIT/,/END OMIT/
+
+* REST API - Getting a product
+
+.code  -edit restapi/restapi.go /GET OMIT/,/END OMIT/
+.code  -edit restapi/restapi.go /RESPOND OMIT/,/END OMIT/
+
